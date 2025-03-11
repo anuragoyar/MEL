@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Customer Portal{% endblock %}
+
+{% block meta_description %}Create a new account for the customer portal{% endblock %}
+
+{% block body_class %}signup-page{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="logo-container">
+            <img src="/static/images/company-logo.png" alt="Company Logo" class="company-logo">
+        </div>
+        
+        <h1>Create Account</h1>
+        <p class="subtitle">Sign up for a new account</p>
+        
+        <div id="error-message" class="error-message" role="alert" aria-live="assertive"></div>
+        
+        <form id="signup-form" method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    required 
+                    autocomplete="name"
+                    aria-required="true"
+                >
+                <div id="name-error" class="field-error" aria-live="polite"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    autocomplete="email"
+                    aria-required="true"
+                >
+                <div id="email-error" class="field-error" aria-live="polite"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-input-container">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required
+                        autocomplete="new-password"
+                        aria-required="true"
+                    >
+                </div>
+                <div id="password-error" class="field-error" aria-live="polite"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <div class="password-input-container">
+                    <input 
+                        type="password" 
+                        id="confirm-password" 
+                        name="confirm_password" 
+                        required
+                        autocomplete="new-password"
+                        aria-required="true"
+                    >
+                </div>
+                <div id="confirm-password-error" class="field-error" aria-live="polite"></div>
+            </div>
+            
+            <button type="submit" class="login-button">Create Account</button>
+        </form>
+        
+        <div class="signup-link">
+            <p>Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %} 
