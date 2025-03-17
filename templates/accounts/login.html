@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Customer Portal{% endblock %}
+
+{% block meta_description %}Secure login to access your customer portal account{% endblock %}
+
+{% block body_class %}login-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/login.css">
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="logo-container">
+            <img src="/static/images/company-logo.png" alt="Company Logo" class="company-logo">
+        </div>
+        
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Sign in to your account</p>
+        
+        <div id="error-message" class="error-message" role="alert" aria-live="assertive"></div>
+        
+        <form id="login-form" method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    autocomplete="email"
+                    aria-required="true"
+                    aria-describedby="email-error"
+                >
+                <div id="email-error" class="field-error" aria-live="polite"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-input-container">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required
+                        autocomplete="current-password"
+                        aria-required="true"
+                        aria-describedby="password-error"
+                    >
+                    <button type="button" id="toggle-password" class="toggle-password" aria-label="Toggle password visibility">
+                        <span class="show-password-icon"><i class="fa-solid fa-eye"></i></span>
+                        <span class="hide-password-icon"><i class="fa-solid fa-eye-slash"></i></span>
+                    </button>
+                </div>
+                <div id="password-error" class="field-error" aria-live="polite"></div>
+            </div>
+            
+            <div class="form-group remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember-me" name="remember_me">
+                    <label for="remember-me">Remember me</label>
+                </div>
+                <a href="{% url 'accounts:forgot_password' %}" class="forgot-password">Forgot password?</a>
+            </div>
+            
+            <button type="submit" class="login-button">Sign In</button>
+        </form>
+        
+        <div class="signup-link">
+            <p>Don't have an account? <a href="{% url 'accounts:signup' %}">Sign up</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/login.js"></script>
+{% endblock %} 
