@@ -6,6 +6,10 @@
 
 {% block body_class %}signup-page{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/login.css">
+{% endblock %}
+
 {% block content %}
 <div class="login-container">
     <div class="login-card">
@@ -58,6 +62,10 @@
                         autocomplete="new-password"
                         aria-required="true"
                     >
+                    <button type="button" id="toggle-password" class="toggle-password" aria-label="Toggle password visibility">
+                        <span class="show-password-icon"><i class="fa-solid fa-eye"></i></span>
+                        <span class="hide-password-icon"><i class="fa-solid fa-eye-slash"></i></span>
+                    </button>
                 </div>
                 <div id="password-error" class="field-error" aria-live="polite"></div>
             </div>
@@ -73,6 +81,10 @@
                         autocomplete="new-password"
                         aria-required="true"
                     >
+                    <button type="button" id="toggle-confirm-password" class="toggle-password" aria-label="Toggle password visibility">
+                        <span class="show-password-icon"><i class="fa-solid fa-eye"></i></span>
+                        <span class="hide-password-icon"><i class="fa-solid fa-eye-slash"></i></span>
+                    </button>
                 </div>
                 <div id="confirm-password-error" class="field-error" aria-live="polite"></div>
             </div>
@@ -85,4 +97,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/signup.js"></script>
 {% endblock %} 

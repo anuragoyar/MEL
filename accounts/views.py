@@ -1,12 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from django.http import JsonResponse
 import json
 import logging
+import requests
+from django.conf import settings
 
 # Set up logging
 logger = logging.getLogger(__name__)
+
+User = get_user_model()
 
 def login_view(request):
     """
@@ -65,4 +69,30 @@ def signup(request):
     """
     View for handling user registration.
     """
+    if request.method == 'POST':
+        try:
+            # Get registration data from request
+            data = json.loads(request.body)
+            
+            # Forward the request to the API
+            api_url = request.build_absolute_uri('/api/v1/auth/signup')
+            
+            # Make the API request
+            response = requests.post(
+                api_url,
+                json=data,
+                headers={'Content-Type': 'application/json'}
+            )
+            
+            # Return the API response
+            return JsonResponse(response.json(), status=response.status_code)
+                
+        except json.JSONDecodeError:
+            logger.error("Invalid JSON in signup request")
+            return JsonResponse({'success': False, 'error': 'Invalid request format'}, status=400)
+        except Exception as e:
+            logger.error(f"Signup error: {str(e)}")
+            return JsonResponse({'success': False, 'error': 'An error occurred during signup'}, status=500)
+    
+    # GET request - render signup page
     return render(request, 'accounts/signup.html') 
