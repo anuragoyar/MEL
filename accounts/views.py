@@ -6,6 +6,7 @@ import json
 import logging
 import requests
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -95,4 +96,16 @@ def signup(request):
             return JsonResponse({'success': False, 'error': 'An error occurred during signup'}, status=500)
     
     # GET request - render signup page
-    return render(request, 'accounts/signup.html') 
+    return render(request, 'accounts/signup.html')
+
+@login_required
+def dashboard(request):
+    """
+    View for rendering the dashboard after successful login.
+    This view is protected and requires authentication.
+    """
+    context = {
+        'user': request.user,
+        'page_title': 'Dashboard',
+    }
+    return render(request, 'accounts/dashboard.html', context) 
