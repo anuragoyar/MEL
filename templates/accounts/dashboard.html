@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | Customer Portal{% endblock %}
+
+{% block meta_description %}Your personalized dashboard for managing your account and services.{% endblock %}
+{% block meta_keywords %}dashboard, account management, customer portal{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/dashboard.css">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="logo">
+            <h1>Customer Portal</h1>
+        </div>
+        <div class="user-info">
+            <span class="welcome-message">Welcome, {{ user.first_name|default:user.email }}</span>
+            <div class="user-actions">
+                <a href="#" class="btn btn-sm btn-outline">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+                <a href="#" class="btn btn-sm btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-content">
+        <aside class="sidebar">
+            <nav class="main-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-file-invoice"></i> Reports</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Dashboard</h2>
+                <p class="subtitle">Overview of your account and recent activity</p>
+            </div>
+
+            <div class="dashboard-widgets">
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-chart-pie"></i> Summary</h3>
+                    </div>
+                    <div class="widget-content">
+                        <p>Welcome to your dashboard. This is a placeholder for your dashboard content.</p>
+                    </div>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                    </div>
+                    <div class="widget-content">
+                        <p>You have no new notifications.</p>
+                    </div>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-tasks"></i> Recent Activity</h3>
+                    </div>
+                    <div class="widget-content">
+                        <p>No recent activity to display.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="dashboard-footer">
+        <p>&copy; 2023 Customer Portal. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %} 
