@@ -24,6 +24,7 @@
         
         <form id="login-form" method="post" novalidate>
             {% csrf_token %}
+            <input type="hidden" id="next" name="next" value="{{ request.GET.next|default:'/dashboard/' }}">
             
             <div class="form-group">
                 <label for="email">Email Address</label>

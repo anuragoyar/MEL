@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const togglePasswordButton = document.getElementById('toggle-password');
     const rememberMeCheckbox = document.getElementById('remember-me');
     
+    // Get the 'next' parameter from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const nextUrl = urlParams.get('next') || '/dashboard/';
+    
     // Track page load for analytics
     trackEvent('Authentication', 'Login Page View');
     
@@ -143,14 +147,23 @@ document.addEventListener('DOMContentLoaded', function() {
         trackEvent('Authentication', 'Login Attempt', `Email: ${email.substring(0, 3)}...`);
         
         try {
-            // Submit form data to API
-            const response = await apiRequest('/api/v1/auth/login', 'POST', {
-                email,
-                password,
-                remember_me: rememberMe
+            // Submit form data to server
+            const response = await fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                    remember_me: rememberMe
+                })
             });
             
-            if (response.success) {
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
                 // Track successful login
                 trackEvent('Authentication', 'Login Success');
                 
@@ -158,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loginAttempts = 0;
                 
                 // Redirect to dashboard or specified URL
-                window.location.href = response.data.redirect || '/dashboard/';
+                window.location.href = data.redirect || nextUrl;
             } else {
                 // Handle error response
                 if (response.status === 401) {
@@ -169,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     showFormError('Too many login attempts. Please try again later.');
                     trackEvent('Authentication', 'Login Rate Limited');
                 } else {
-                    showFormError('An error occurred. Please try again later.');
+                    showFormError(data.error || 'An error occurred. Please try again later.');
                     trackEvent('Authentication', 'Login Error', `Status: ${response.status}`);
                 }
             }
