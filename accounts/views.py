@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.http import JsonResponse
 import json
 import logging
 import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -111,4 +112,15 @@ def dashboard(request):
         'user': request.user,
         'page_title': 'Dashboard',
     }
-    return render(request, 'accounts/dashboard.html', context) 
+    return render(request, 'accounts/dashboard.html', context)
+
+@login_required
+def logout_view(request):
+    """
+    View for handling user logout.
+    """
+    if request.method == 'POST':
+        logout(request)
+        messages.success(request, 'You have been successfully logged out.')
+        return redirect('accounts:login')
+    return redirect('accounts:dashboard') 

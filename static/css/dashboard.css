@@ -43,9 +43,35 @@
     color: #666;
 }
 
+/* User Actions */
 .user-actions {
     display: flex;
     gap: 0.5rem;
+}
+
+.user-actions .d-inline {
+    display: inline-block;
+}
+
+.user-actions form {
+    margin: 0;
+}
+
+.user-actions button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #666;
+    transition: all 0.2s ease;
+}
+
+.user-actions button:hover {
+    background-color: #f5f5f5;
+    color: #333;
 }
 
 .btn {

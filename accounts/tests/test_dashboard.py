@@ -93,7 +93,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, '<div class="widget">')
         self.assertContains(response, '<div class="widget-header">')
         self.assertContains(response, '<div class="widget-content">')
-
+    
     def test_logout_functionality(self):
         """
         Test that the logout functionality works correctly
@@ -117,7 +117,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(self.dashboard_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.url.startswith(self.login_url))
-
+    
     def test_logout_requires_post(self):
         """
         Test that logout only works with POST method
@@ -129,9 +129,9 @@ class DashboardViewTest(TestCase):
         logout_url = reverse('accounts:logout')
         response = self.client.get(logout_url)
         
-        # Should be redirected to dashboard (GET not allowed)
+        # Should be redirected to dashboard
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.url.startswith(self.dashboard_url))
+        self.assertEqual(response.url, '/dashboard/')
         
         # Verify still logged in by accessing dashboard
         response = self.client.get(self.dashboard_url)
