@@ -25,6 +25,9 @@ def login_view(request):
             password = data.get('password', '')
             remember_me = data.get('remember_me', False)
             
+            # Get the next URL from the request
+            next_url = request.GET.get('next', '/dashboard/')
+            
             # Log login attempt (without password)
             logger.info(f"Login attempt for email: {email}")
             
@@ -44,7 +47,7 @@ def login_view(request):
                     request.session.set_expiry(0)
                 
                 logger.info(f"Login successful for email: {email}")
-                return JsonResponse({'success': True, 'redirect': '/dashboard/'})
+                return JsonResponse({'success': True, 'redirect': next_url})
             else:
                 # Login failed
                 logger.warning(f"Login failed for email: {email}")
