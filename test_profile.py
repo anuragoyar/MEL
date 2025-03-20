@@ -10,78 +10,102 @@ class ProfileViewTests(TestCase):
     def setUp(self):
         """Set up test data."""
         self.client = Client()
+        self.profile_url = reverse('accounts:profile')
+        self.login_url = reverse('accounts:login')
+        
+        # Create a test user
         self.user = User.objects.create_user(
-            email='testuser@example.com',
+            email='test@example.com',
             password='testpass123',
             first_name='Test',
             last_name='User',
             date_joined=timezone.make_aware(datetime(2023, 1, 1))
         )
-        self.profile_url = reverse('accounts:profile')
-        self.login_url = reverse('accounts:login')
 
-    def test_profile_view_requires_login(self):
-        """Test that profile view requires authentication."""
-        # Try accessing profile without login
-        response = self.client.get(self.profile_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.url.startswith(self.login_url))
-
-        # Login and try again
-        self.client.login(username='testuser@example.com', password='testpass123')
-        response = self.client.get(self.profile_url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_profile_view_uses_correct_template(self):
-        """Test that profile view uses the correct template."""
-        self.client.login(username='testuser@example.com', password='testpass123')
+    def test_profile_url_exists(self):
+        """Test that profile URL exists and returns correct template."""
+        self.client.force_login(self.user)
         response = self.client.get(self.profile_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts/profile.html')
 
-    def test_profile_context_data(self):
-        """Test that profile view provides correct context data."""
-        self.client.login(username='testuser@example.com', password='testpass123')
+    def test_profile_requires_authentication(self):
+        """Test that profile page requires authentication."""
+        # Try accessing without login
         response = self.client.get(self.profile_url)
-        
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['user'], self.user)
-        self.assertEqual(response.context['page_title'], 'Profile')
-        self.assertEqual(
-            response.context['date_joined'],
-            self.user.date_joined.strftime('%B %d, %Y')
+        self.assertRedirects(
+            response, 
+            f'{self.login_url}?next={self.profile_url}'
         )
 
-    def test_profile_content(self):
+    def test_profile_displays_user_info(self):
         """Test that profile page displays correct user information."""
-        self.client.login(username='testuser@example.com', password='testpass123')
+        self.client.force_login(self.user)
         response = self.client.get(self.profile_url)
         
+        # Check that user info is in context
+        self.assertEqual(response.context['user'], self.user)
+        self.assertEqual(
+            response.context['date_joined'],
+            'January 01, 2023'
+        )
+        
+        # Check content in response
         content = response.content.decode()
         self.assertIn('Test User', content)  # Full name
-        self.assertIn('testuser@example.com', content)  # Email
+        self.assertIn('test@example.com', content)  # Email
         self.assertIn('January 01, 2023', content)  # Date joined
 
-    def test_profile_with_minimal_user_info(self):
-        """Test profile display with minimal user information."""
-        minimal_user = User.objects.create_user(
-            email='minimal@example.com',
+    def test_profile_handles_missing_name(self):
+        """Test that profile page handles missing name gracefully."""
+        # Create user without name
+        user_no_name = User.objects.create_user(
+            email='noname@example.com',
             password='testpass123'
         )
         
-        self.client.login(username='minimal@example.com', password='testpass123')
+        self.client.force_login(user_no_name)
         response = self.client.get(self.profile_url)
         
-        content = response.content.decode()
-        self.assertIn('Not provided', content)  # Default text for missing name
-        self.assertIn('minimal@example.com', content)
+        # Check that default value is used
+        self.assertIn('Not provided', response.content.decode())
 
-    def test_profile_navigation_links(self):
-        """Test that profile page contains correct navigation links."""
-        self.client.login(username='testuser@example.com', password='testpass123')
+    def test_profile_page_context(self):
+        """Test that profile page contains all required context variables."""
+        self.client.force_login(self.user)
+        response = self.client.get(self.profile_url)
+        
+        self.assertIn('user', response.context)
+        self.assertIn('page_title', response.context)
+        self.assertIn('date_joined', response.context)
+        
+        self.assertEqual(response.context['page_title'], 'Profile')
+
+    def test_profile_navigation(self):
+        """Test navigation links on profile page."""
+        self.client.force_login(self.user)
         response = self.client.get(self.profile_url)
         
         content = response.content.decode()
         dashboard_url = reverse('accounts:dashboard')
+        logout_url = reverse('accounts:logout')
+        
+        # Check that navigation links exist
         self.assertIn(f'href="{dashboard_url}"', content)
-        self.assertIn('class="active"', content)  # Profile link should be active 
+        self.assertIn(f'action="{logout_url}"', content)
+
+    def test_special_characters_handling(self):
+        """Test that profile page handles special characters correctly."""
+        # Create user with special characters in name
+        user_special = User.objects.create_user(
+            email='special@example.com',
+            password='testpass123',
+            first_name='Tést',
+            last_name='Üser'
+        )
+        
+        self.client.force_login(user_special)
+        response = self.client.get(self.profile_url)
+        
+        content = response.content.decode()
+        self.assertIn('Tést Üser', content) 

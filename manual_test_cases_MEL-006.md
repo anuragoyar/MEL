@@ -1,109 +1,97 @@
-# Manual Test Cases for MEL-006: Profile Page Implementation
+# Manual Test Cases for Profile Page (MEL-006)
 
-## Test Case 1: Profile Navigation from Dashboard
-**Description**: Verify that users can navigate to the profile page from the dashboard.
+## Test Case 1: Profile Navigation
+**Description**: Verify that clicking the profile button navigates to the profile page  
+**Prerequisites**: User is logged in and on the dashboard page  
 **Steps**:
-1. Log in to the application
-2. Navigate to the dashboard
-3. Click on the "Profile" button in the header
+1. Click on the profile button in the sidebar
+2. Observe the URL change and page navigation
 
 **Expected Results**:
-- User is redirected to the profile page
-- URL should change to /profile/
-- Profile page should load without errors
+- URL should change to `/profile/`
+- Profile page should load with user information
+- Sidebar should show "Profile" as active
 
-## Test Case 2: Profile Page Content Display
-**Description**: Verify that all user information is displayed correctly on the profile page.
+## Test Case 2: Profile Information Display
+**Description**: Verify that all user information is displayed correctly  
+**Prerequisites**: User is logged in and on the profile page  
 **Steps**:
-1. Log in to the application
-2. Navigate to the profile page
-3. Check all displayed user information
+1. Observe the profile card section
+2. Check the full name display
+3. Check the email address display
+4. Check the date joined display
 
 **Expected Results**:
-- Full Name is displayed (or "Not provided" if not set)
-- Email Address is displayed correctly
-- Date Joined is displayed in the format "Month DD, YYYY"
-- All information matches the user's actual data
+- Full name should be displayed (or "Not provided" if not set)
+- Email address should match the logged-in user's email
+- Date joined should be in the format "Month DD, YYYY"
+- All information should be correctly formatted and styled
 
-## Test Case 3: Profile Page Layout and Styling
-**Description**: Verify that the profile page layout and styling are correct.
+## Test Case 3: Authentication Check
+**Description**: Verify that the profile page is only accessible to authenticated users  
+**Prerequisites**: User is not logged in  
 **Steps**:
-1. Log in to the application
-2. Navigate to the profile page
-3. Check the page layout and styling elements
+1. Try to access the profile page directly via URL (/profile/)
+2. Observe the system response
 
 **Expected Results**:
-- Page follows the same layout structure as the dashboard
-- Profile card is properly styled with shadow and rounded corners
-- Font Awesome icons are displayed correctly
-- Responsive design works on different screen sizes
+- User should be redirected to the login page
+- After successful login, user should be redirected back to the profile page
 
-## Test Case 4: Authentication Protection
-**Description**: Verify that the profile page is protected from unauthorized access.
+## Test Case 4: Profile Page Layout and Responsiveness
+**Description**: Verify that the profile page layout is correct and responsive  
+**Prerequisites**: User is logged in and on the profile page  
 **Steps**:
-1. Open a new browser window (not logged in)
-2. Try to access the profile page directly via URL (/profile/)
+1. View the page on a desktop browser
+2. Resize the browser window to tablet size
+3. Resize the browser window to mobile size
+4. Check all elements' visibility and alignment
 
 **Expected Results**:
-- User is redirected to the login page
-- After successful login, user is redirected back to the profile page
+- All elements should be properly aligned and spaced
+- Profile card should be centered and properly formatted
+- Sidebar should collapse/adjust based on screen size
+- Text should be readable at all screen sizes
+- No horizontal scrolling should be required
 
-## Test Case 5: Navigation Back to Dashboard
-**Description**: Verify that users can navigate back to the dashboard from the profile page.
+## Test Case 5: Navigation Links
+**Description**: Verify that all navigation links on the profile page work correctly  
+**Prerequisites**: User is logged in and on the profile page  
 **Steps**:
-1. Log in to the application
-2. Navigate to the profile page
-3. Click on the "Dashboard" button in the header
+1. Click the Dashboard link in the header
+2. Return to profile page
+3. Click the Logout button
+4. Try to access profile page after logout
 
 **Expected Results**:
-- User is redirected to the dashboard page
-- URL should change to /dashboard/
-- Dashboard page should load without errors
-
-## Test Case 6: Sidebar Navigation
-**Description**: Verify that the sidebar navigation works correctly on the profile page.
-**Steps**:
-1. Log in to the application
-2. Navigate to the profile page
-3. Check the sidebar navigation items
-
-**Expected Results**:
-- "Profile" item in the sidebar is highlighted as active
-- Other navigation items are visible but not highlighted
-- Sidebar maintains consistent styling with the dashboard
-
-## Test Case 7: Logout from Profile Page
-**Description**: Verify that users can log out from the profile page.
-**Steps**:
-1. Log in to the application
-2. Navigate to the profile page
-3. Click the "Logout" button
-
-**Expected Results**:
-- User is successfully logged out
-- User is redirected to the login page
-- Session is terminated
+- Dashboard link should navigate to dashboard page
+- Logout button should successfully log out the user
+- After logout, attempting to access profile should redirect to login page
 
 ## Edge Cases
 
-### Test Case 8: Missing User Information
-**Description**: Verify proper handling of missing user information.
+### Test Case 6: Long Text Handling
+**Description**: Verify that the page handles long text values appropriately  
+**Prerequisites**: User account with very long name/email  
 **Steps**:
-1. Log in with a user account that has minimal information (e.g., only email)
+1. Log in with a test account that has a very long name
 2. Navigate to the profile page
+3. Observe how long text is displayed
 
 **Expected Results**:
-- Full Name shows "Not provided" when name is not set
-- Other fields display available information correctly
-- No errors or layout issues due to missing data
+- Long text should be properly truncated or wrapped
+- Page layout should not break
+- All information should remain readable
 
-### Test Case 9: Long Text Handling
-**Description**: Verify proper handling of long text in user information fields.
+### Test Case 7: Special Characters
+**Description**: Verify that the page handles special characters correctly  
+**Prerequisites**: User account with special characters in name  
 **Steps**:
-1. Log in with a user account that has very long values for name or email
+1. Log in with a test account that has special characters in the name
 2. Navigate to the profile page
+3. Observe how special characters are displayed
 
 **Expected Results**:
-- Long text is properly contained within the layout
-- No text overflow issues
-- Layout remains consistent and visually appealing 
+- Special characters should be displayed correctly
+- No encoding issues should be visible
+- Page layout should remain intact 
