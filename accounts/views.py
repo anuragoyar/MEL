@@ -123,4 +123,17 @@ def logout_view(request):
         logout(request)
         messages.success(request, 'You have been successfully logged out.')
         return redirect('accounts:login')
-    return redirect('accounts:dashboard') 
+    return redirect('accounts:dashboard')
+
+@login_required
+def profile(request):
+    """
+    View for displaying user profile information.
+    This view is protected and requires authentication.
+    """
+    context = {
+        'user': request.user,
+        'page_title': 'Profile',
+        'date_joined': request.user.date_joined.strftime('%B %d, %Y')
+    }
+    return render(request, 'accounts/profile.html', context) 
