@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile | Customer Portal{% endblock %}
+
+{% block meta_description %}Your profile information and account details.{% endblock %}
+{% block meta_keywords %}profile, account details, user information{% endblock %}
+
+{% block body_class %}profile-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/dashboard.css">
+<style>
+    .profile-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .profile-avatar {
+        font-size: 4rem;
+        color: #4a5568;
+        margin-right: 1.5rem;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-info h3 {
+        margin: 0;
+        color: #2d3748;
+        font-size: 1.5rem;
+    }
+
+    .profile-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .detail-item {
+        padding: 1rem;
+        background: #f7fafc;
+        border-radius: 6px;
+    }
+
+    .detail-item i {
+        color: #4299e1;
+        margin-right: 0.5rem;
+    }
+
+    .detail-label {
+        color: #718096;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        color: #2d3748;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="logo">
+            <h1>Customer Portal</h1>
+        </div>
+        <div class="user-info">
+            <span class="welcome-message">Welcome, {{ user.first_name|default:user.email }}</span>
+            <div class="user-actions">
+                <a href="{% url 'accounts:dashboard' %}" class="btn btn-sm btn-outline">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <form action="{% url 'accounts:logout' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-content">
+        <aside class="sidebar">
+            <nav class="main-nav">
+                <ul>
+                    <li>
+                        <a href="{% url 'accounts:dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li class="active">
+                        <a href="{% url 'accounts:profile' %}"><i class="fas fa-user-circle"></i> Profile</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-file-invoice"></i> Reports</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Profile</h2>
+                <p class="subtitle">View and manage your profile information</p>
+            </div>
+
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h3>{{ user.get_full_name|default:"User" }}</h3>
+                        <p>Account Details</p>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-user"></i> Full Name
+                        </div>
+                        <div class="detail-value">
+                            {{ user.get_full_name|default:"Not provided" }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </div>
+                        <div class="detail-value">
+                            {{ user.email }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-calendar-alt"></i> Date Joined
+                        </div>
+                        <div class="detail-value">
+                            {{ date_joined }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="dashboard-footer">
+        <p>&copy; 2023 Customer Portal. All rights reserved.</p>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %} 
