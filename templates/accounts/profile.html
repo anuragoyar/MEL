@@ -68,6 +68,63 @@
         color: #2d3748;
         font-weight: 500;
     }
+
+    /* New styles for edit mode */
+    .detail-value input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #2d3748;
+        background-color: white;
+        margin-top: 0.25rem;
+    }
+
+    .detail-value input:focus {
+        outline: none;
+        border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+    }
+
+    .profile-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+        gap: 1rem;
+    }
+
+    .btn-primary {
+        background-color: #4299e1;
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #3182ce;
+    }
+
+    .btn-secondary {
+        background-color: #e2e8f0;
+        color: #4a5568;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #cbd5e0;
+    }
+
+    .error-message {
+        color: #e53e3e;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    .success-message {
+        color: #38a169;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
 </style>
 {% endblock %}
 
@@ -136,34 +193,53 @@
                     </div>
                 </div>
 
-                <div class="profile-details">
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-user"></i> Full Name
+                <form id="profile-form" method="post">
+                    {% csrf_token %}
+                    <div class="profile-details">
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-user"></i> Full Name
+                            </div>
+                            <div class="detail-value">
+                                <span id="full-name-display">{{ user.get_full_name|default:"Not provided" }}</span>
+                                <input type="text" id="full-name-input" name="full_name" value="{{ user.get_full_name }}" style="display: none;" required>
+                            </div>
                         </div>
-                        <div class="detail-value">
-                            {{ user.get_full_name|default:"Not provided" }}
+
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-envelope"></i> Email Address
+                            </div>
+                            <div class="detail-value">
+                                <span id="email-display">{{ user.email }}</span>
+                                <input type="email" id="email-input" name="email" value="{{ user.email }}" style="display: none;" required>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-calendar-alt"></i> Date Joined
+                            </div>
+                            <div class="detail-value">
+                                {{ date_joined }}
+                            </div>
                         </div>
                     </div>
 
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-envelope"></i> Email Address
-                        </div>
-                        <div class="detail-value">
-                            {{ user.email }}
-                        </div>
-                    </div>
+                    <div id="profile-message"></div>
 
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-calendar-alt"></i> Date Joined
-                        </div>
-                        <div class="detail-value">
-                            {{ date_joined }}
-                        </div>
+                    <div class="profile-actions">
+                        <button type="button" id="edit-profile" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                        <button type="submit" id="save-profile" class="btn btn-primary" style="display: none;">
+                            <i class="fas fa-save"></i> Save Profile
+                        </button>
+                        <button type="button" id="cancel-edit" class="btn btn-secondary" style="display: none;">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
                     </div>
-                </div>
+                </form>
             </div>
         </main>
     </div>
@@ -176,4 +252,82 @@
 
 {% block extra_js %}
 <script src="/static/js/dashboard.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editButton = document.getElementById('edit-profile');
+    const saveButton = document.getElementById('save-profile');
+    const cancelButton = document.getElementById('cancel-edit');
+    const profileForm = document.getElementById('profile-form');
+    const messageDiv = document.getElementById('profile-message');
+    const fullNameDisplay = document.getElementById('full-name-display');
+    const emailDisplay = document.getElementById('email-display');
+    const fullNameInput = document.getElementById('full-name-input');
+    const emailInput = document.getElementById('email-input');
+
+    let isEditing = false;
+
+    function toggleEditMode(enabled) {
+        isEditing = enabled;
+        editButton.style.display = enabled ? 'none' : 'block';
+        saveButton.style.display = enabled ? 'block' : 'none';
+        cancelButton.style.display = enabled ? 'block' : 'none';
+        fullNameDisplay.style.display = enabled ? 'none' : 'block';
+        emailDisplay.style.display = enabled ? 'none' : 'block';
+        fullNameInput.style.display = enabled ? 'block' : 'none';
+        emailInput.style.display = enabled ? 'block' : 'none';
+
+        if (enabled) {
+            fullNameInput.value = fullNameDisplay.textContent.trim();
+            emailInput.value = emailDisplay.textContent.trim();
+        }
+    }
+
+    function showMessage(message, isError = false) {
+        messageDiv.textContent = message;
+        messageDiv.className = isError ? 'error-message' : 'success-message';
+        setTimeout(() => {
+            messageDiv.textContent = '';
+            messageDiv.className = '';
+        }, 5000);
+    }
+
+    editButton.addEventListener('click', () => {
+        toggleEditMode(true);
+    });
+
+    cancelButton.addEventListener('click', () => {
+        toggleEditMode(false);
+        messageDiv.textContent = '';
+        messageDiv.className = '';
+    });
+
+    profileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(profileForm);
+        try {
+            const response = await fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                fullNameDisplay.textContent = data.data.full_name;
+                emailDisplay.textContent = data.data.email;
+                toggleEditMode(false);
+                showMessage(data.message);
+            } else {
+                showMessage(data.error, true);
+            }
+        } catch (error) {
+            showMessage('An error occurred while updating profile', true);
+        }
+    });
+});
+</script>
 {% endblock %} 

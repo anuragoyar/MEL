@@ -8,6 +8,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+import re
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -128,9 +129,54 @@ def logout_view(request):
 @login_required
 def profile(request):
     """
-    View for displaying user profile information.
+    View for displaying and updating user profile information.
     This view is protected and requires authentication.
     """
+    if request.method == 'POST':
+        try:
+            # Get form data
+            full_name = request.POST.get('full_name', '').strip()
+            email = request.POST.get('email', '').strip()
+
+            # Validate full name
+            if not full_name:
+                return JsonResponse({'success': False, 'error': 'Full name is required'}, status=400)
+            if len(full_name.split()) < 2:
+                return JsonResponse({'success': False, 'error': 'Please provide both first and last name'}, status=400)
+
+            # Validate email
+            if not email:
+                return JsonResponse({'success': False, 'error': 'Email is required'}, status=400)
+            if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
+                return JsonResponse({'success': False, 'error': 'Please provide a valid email address'}, status=400)
+
+            # Check if email is already taken by another user
+            if User.objects.exclude(id=request.user.id).filter(email=email).exists():
+                return JsonResponse({'success': False, 'error': 'This email is already in use'}, status=400)
+
+            # Split full name into first and last name
+            name_parts = full_name.split(maxsplit=1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
+
+            # Update user profile
+            user = request.user
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+            user.save()
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Profile updated successfully',
+                'data': {
+                    'full_name': user.get_full_name(),
+                    'email': user.email
+                }
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': 'An error occurred while updating profile'}, status=500)
+
     context = {
         'user': request.user,
         'page_title': 'Profile',

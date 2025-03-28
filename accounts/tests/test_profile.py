@@ -94,6 +94,81 @@ class ProfileViewTests(TestCase):
         self.assertIn(f'href="{dashboard_url}"', content)
         self.assertIn(f'action="{logout_url}"', content)
 
+    def test_profile_update_success(self):
+        """Test successful profile update."""
+        self.client.force_login(self.user)
+        new_data = {
+            'full_name': 'Updated Name',
+            'email': 'updated@example.com'
+        }
+        response = self.client.post(self.profile_url, new_data)
+        
+        # Check response
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+        self.assertEqual(data['data']['full_name'], 'Updated Name')
+        self.assertEqual(data['data']['email'], 'updated@example.com')
+        
+        # Check database update
+        user = User.objects.get(id=self.user.id)
+        self.assertEqual(user.get_full_name(), 'Updated Name')
+        self.assertEqual(user.email, 'updated@example.com')
+
+    def test_profile_update_invalid_email(self):
+        """Test profile update with invalid email."""
+        self.client.force_login(self.user)
+        response = self.client.post(self.profile_url, {
+            'full_name': 'Valid Name',
+            'email': 'invalid-email'
+        })
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertFalse(data['success'])
+        self.assertIn('valid email', data['error'].lower())
+
+    def test_profile_update_duplicate_email(self):
+        """Test profile update with already existing email."""
+        # Create another user
+        other_user = User.objects.create_user(
+            email='other@example.com',
+            password='testpass123'
+        )
+        
+        self.client.force_login(self.user)
+        response = self.client.post(self.profile_url, {
+            'full_name': 'Valid Name',
+            'email': 'other@example.com'
+        })
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertFalse(data['success'])
+        self.assertIn('already in use', data['error'].lower())
+
+    def test_profile_update_invalid_name(self):
+        """Test profile update with invalid name."""
+        self.client.force_login(self.user)
+        response = self.client.post(self.profile_url, {
+            'full_name': 'SingleName',
+            'email': 'valid@example.com'
+        })
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertFalse(data['success'])
+        self.assertIn('both first and last name', data['error'].lower())
+
+    def test_profile_update_missing_data(self):
+        """Test profile update with missing data."""
+        self.client.force_login(self.user)
+        response = self.client.post(self.profile_url, {})
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertFalse(data['success'])
+
     def test_special_characters_handling(self):
         """Test that profile page handles special characters correctly."""
         # Create user with special characters in name
