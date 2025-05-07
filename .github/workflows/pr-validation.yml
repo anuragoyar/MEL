@@ -33,7 +33,7 @@ jobs:
           fi 
 
   validate-pr-2:
-    needs: validate-pr
+    needs: validate-pr-1
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
