@@ -1,8 +1,5 @@
 # import requests
 # import json
-# import unittest
-
-# # unittest.skip("Skip this test in CI because it requires a running server.")
 
 # # API endpoint
 # url = "http://localhost:8000/api/v1/auth/signup"

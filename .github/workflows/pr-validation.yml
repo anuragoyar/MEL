@@ -5,7 +5,7 @@ on:
     types: [opened, edited, synchronize, reopened]
 
 jobs:
-  validate-pr:
+  validate-pr-1:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,3 +31,60 @@ jobs:
             echo "PR title or description cannot be empty."
             exit 1
           fi 
+
+  validate-pr-2:
+    needs: validate-pr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Django tests
+        run: |
+          python manage.py test
+
+      - name: Validate PR title and description
+        run: |
+          if [[ "${{ github.event.pull_request.title }}" == "" || "${{ github.event.pull_request.body }}" == "" ]]; then
+            echo "PR title or description cannot be empty."
+            exit 1
+          fi 
+          
+  validate-pr-3:
+    needs: validate-pr-2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Django tests
+        run: |
+          python manage.py test
+
+
+      - name: Validate PR title and description
+        run: |
+          if [[ "${{ github.event.pull_request.title }}" == "" || "${{ github.event.pull_request.body }}" == "" ]]; then
+            echo "PR title or description cannot be empty."
+            exit 1
+          fi
